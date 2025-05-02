@@ -323,10 +323,105 @@ diff.rand <- randomization.dist(data$diff, 0)
 In this step, we found representative distribution for each case. As can be seen, each of the randomized distributions has a mean of about zero.
 
   \item Compute the randomization test $p$-value for each test.
+
+<<message=F, warning=F, eval=T>>=    
+closer.mean <- mean(data$closer)
+closer.p.random <- mean(closer.rand$means >= closer.mean)
+
+further.mean <- mean(data$further)
+further.p.random <- mean(farther.rand$means <= further.mean)
+
+diff.delta <- abs(mean(data$diff) - mu0)
+mirror <- mu0 - diff.delta
+xbar <- mu0 + diff.delta
+
+diff.p.random <- mean(diff.rand$means <= mirror) + 
+                 mean(diff.rand$means >= xbar)
+
+(closer.p.random)
+(further.p.random)
+(diff.p.random)
+@
+
+All the p-values are zero which means there is statistically discernible support for the alternative hypothesis. The p-value of zero suggests that the observed mean is in the right tail for close, left tail for further, and in both tails for the difference.
   \item Compute the randomization confidence interval by iterating over values of $\mu_0$.\\
   \textbf{Hint:} You can ``search" for the lower bound from $Q_1$ and subtracting by 0.0001, 
   and the upper bound using $Q_3$ and increasing by 0.0001. You will continue until you find 
   the first value for which the two-sided $p$-value is greater than or equal to 0.05.
+
+<<message=F, warning=F, eval=T>>=    
+CI.finder <- function(data, R = 1000){
+  
+  mu0.iter <- 0.01
+  mu0.lower <- mean(data)
+  mu0.higher <- mean(data)
+  
+  repeat{
+    random <- tibble(means = rep(NA, R))
+    
+    shifted.data <- data - mu0.lower
+    
+    for(i in 1:R) {
+      curr.random <- shifted.data * sample(x = c(-1, 1), 
+                                           size = length(shifted.data), 
+                                           replace = TRUE)
+      random$means[i] <- mean(curr.random)
+    }
+    
+    random <- random |>
+      mutate(means = means + mu0.lower)
+    
+    delta <- abs(mean(data) - mu0.lower)
+    low <- mu0.lower - delta 
+    high <- mu0.lower + delta   
+    p.val <- mean(random$means <= low) +
+             mean(random$means >= high)
+    
+    if(p.val < 0.05){
+      break
+    }else{
+      mu0.lower <- mu0.lower - mu0.iter
+    }
+  }
+  
+  repeat{
+    random <- tibble(means = rep(NA, R))
+    
+    shifted.data <- data - mu0.higher
+    
+    for(i in 1:R) {
+      curr.random <- shifted.data * sample(x = c(-1, 1), 
+                                           size = length(shifted.data), 
+                                           replace = TRUE)
+      random$means[i] <- mean(curr.random)
+    }
+    
+    random <- random |>
+      mutate(means = means + mu0.higher)
+    
+    delta <- abs(mean(data) - mu0.higher)
+    low <- mu0.higher - delta 
+    high <- mu0.higher + delta   
+    p.val <- mean(random$means <= low) +
+      mean(random$means >= high)
+    
+    if(p.val < 0.05){
+      break
+    }else{
+      mu0.higher <- mu0.higher + mu0.iter
+    }
+  }
+  
+  return(c(mu0.lower, mu0.higher))
+}
+
+(close.CI.randomization <- CI.finder(data$closer))
+(further.CI.randomization <- CI.finder(data$further))
+(diff.CI.randomization <- CI.finder(data$diff))
+@
+
+The confidence intervals are (\Sexpr{close.CI.randomization[1]}, \Sexpr{close.CI.randomization[2]}) for close, (\Sexpr{further.CI.randomization[1]}, \Sexpr{further.CI.randomization[2]}) for further, and (\Sexpr{diff.CI.randomization[1]}, \Sexpr{diff.CI.randomization[2]}) for difference. These values are similar to those found earlier in the bootstrap and t-test methods.
+
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

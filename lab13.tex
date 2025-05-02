@@ -254,24 +254,24 @@ sampling distribution of the $T$ statistic:
 \hldef{(}\hlkwd{mean}\hldef{(resamples.null.closer}\hlopt{$}\hldef{shifted))}
 \end{alltt}
 \begin{verbatim}
-## [1] 3.232345e-17
+## [1] 1.514344e-16
 \end{verbatim}
 \begin{alltt}
 \hldef{(}\hlkwd{mean}\hldef{(resamples.null.further}\hlopt{$}\hldef{shifted))}
 \end{alltt}
 \begin{verbatim}
-## [1] 3.218037e-16
+## [1] 1.460165e-16
 \end{verbatim}
 \begin{alltt}
 \hldef{(}\hlkwd{mean}\hldef{(resamples.null.diff}\hlopt{$}\hldef{shifted))}
 \end{alltt}
 \begin{verbatim}
-## [1] -1.722733e-16
+## [1] 8.837708e-16
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
-We tested to see whether the unknown distributions of closer, further, and difference are consistent with the null hypothesis at the average. We used resampling to approximate the distribution and then stored the shifted resamples. The closer shifted mean is \ensuremath{3.2323449\times 10^{-17}}, further shifted mean is \ensuremath{3.2180369\times 10^{-16}}, and the difference shifted mean is \ensuremath{-1.7227331\times 10^{-16}}. All of these values are near zero which indicates that the resamples are consistent with the null.
+We tested to see whether the unknown distributions of closer, further, and difference are consistent with the null hypothesis at the average. We used resampling to approximate the distribution and then stored the shifted resamples. The closer shifted mean is \ensuremath{1.5143442\times 10^{-16}}, further shifted mean is \ensuremath{1.4601653\times 10^{-16}}, and the difference shifted mean is \ensuremath{8.8377083\times 10^{-16}}. All of these values are near zero which indicates that the resamples are consistent with the null.
  
   \item Compute the bootstrap $p$-value for each test using the shifted resamples. How do these compare to the $t$-test $p$-values?
 
@@ -360,8 +360,8 @@ As can be seen, both the T-Test P-Values and Bootstrap P-Values are all near zer
 \hldef{(boot.closer.5th)}
 \end{alltt}
 \begin{verbatim}
-##        5% 
-## -1.582832
+##      5% 
+## -1.6016
 \end{verbatim}
 \begin{alltt}
 \hldef{(t.closer.5th)}
@@ -374,7 +374,7 @@ As can be seen, both the T-Test P-Values and Bootstrap P-Values are all near zer
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.658026
+## -1.689314
 \end{verbatim}
 \begin{alltt}
 \hldef{(t.further.5th)}
@@ -387,7 +387,7 @@ As can be seen, both the T-Test P-Values and Bootstrap P-Values are all near zer
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.574208
+## -1.551229
 \end{verbatim}
 \begin{alltt}
 \hldef{(t.diff.5th)}
@@ -398,7 +398,7 @@ As can be seen, both the T-Test P-Values and Bootstrap P-Values are all near zer
 \end{kframe}
 \end{knitrout}
 
-The bootstrapping $5^{th}$ percentile for the various cases are -1.5828321 for the close, -1.6580257 for the further, and -1.6580257 for the difference. The t-test $5^{th}$ percentile for the various cases are -1.7108821 for the close, -1.7108821 for the further, and -1.7108821 for the difference. As we can see, the bootstrapping and t-test $5^{th}$ percentiles are fairly similar to each other.
+The bootstrapping $5^{th}$ percentile for the various cases are -1.6015998 for the close, -1.6893145 for the further, and -1.6893145 for the difference. The t-test $5^{th}$ percentile for the various cases are -1.7108821 for the close, -1.7108821 for the further, and -1.7108821 for the difference. As we can see, the bootstrapping and t-test $5^{th}$ percentiles are fairly similar to each other.
 
   \item Compute the bootstrap confidence intervals using the resamples. How do these 
   compare to the $t$-test confidence intervals?
@@ -428,7 +428,7 @@ The bootstrapping $5^{th}$ percentile for the various cases are -1.5828321 for t
 \end{alltt}
 \begin{verbatim}
 ##      2.5%     97.5% 
-## 0.1210022 0.1937775
+## 0.1201887 0.1926274
 \end{verbatim}
 \begin{alltt}
 \hldef{(t.CI.closer)}
@@ -443,7 +443,7 @@ The bootstrapping $5^{th}$ percentile for the various cases are -1.5828321 for t
 \end{alltt}
 \begin{verbatim}
 ##       2.5%      97.5% 
-## -0.2555582 -0.1546648
+## -0.2551750 -0.1557434
 \end{verbatim}
 \begin{alltt}
 \hldef{(t.CI.further)}
@@ -458,7 +458,7 @@ The bootstrapping $5^{th}$ percentile for the various cases are -1.5828321 for t
 \end{alltt}
 \begin{verbatim}
 ##      2.5%     97.5% 
-## 0.2807941 0.4437687
+## 0.2810191 0.4414708
 \end{verbatim}
 \begin{alltt}
 \hldef{(t.CI.diff)}
@@ -512,19 +512,19 @@ for the closer, further, and difference data, so perform the randomization proce
 \hldef{(}\hlkwd{mean}\hldef{(closer.rand}\hlopt{$}\hldef{means))}
 \end{alltt}
 \begin{verbatim}
-## [1] 8.144468e-05
+## [1] 0.0003950941
 \end{verbatim}
 \begin{alltt}
 \hldef{(}\hlkwd{mean}\hldef{(farther.rand}\hlopt{$}\hldef{means))}
 \end{alltt}
 \begin{verbatim}
-## [1] -0.0009294325
+## [1] 0.0003820186
 \end{verbatim}
 \begin{alltt}
 \hldef{(}\hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{means))}
 \end{alltt}
 \begin{verbatim}
-## [1] -0.0004612982
+## [1] -0.0001880823
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -532,10 +532,139 @@ for the closer, further, and difference data, so perform the randomization proce
 In this step, we found representative distribution for each case. As can be seen, each of the randomized distributions has a mean of about zero.
 
   \item Compute the randomization test $p$-value for each test.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{closer.mean} \hlkwb{<-} \hlkwd{mean}\hldef{(data}\hlopt{$}\hldef{closer)}
+\hldef{closer.p.random} \hlkwb{<-} \hlkwd{mean}\hldef{(closer.rand}\hlopt{$}\hldef{means} \hlopt{>=} \hldef{closer.mean)}
+
+\hldef{further.mean} \hlkwb{<-} \hlkwd{mean}\hldef{(data}\hlopt{$}\hldef{further)}
+\hldef{further.p.random} \hlkwb{<-} \hlkwd{mean}\hldef{(farther.rand}\hlopt{$}\hldef{means} \hlopt{<=} \hldef{further.mean)}
+
+\hldef{diff.delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(data}\hlopt{$}\hldef{diff)} \hlopt{-} \hldef{mu0)}
+\hldef{mirror} \hlkwb{<-} \hldef{mu0} \hlopt{-} \hldef{diff.delta}
+\hldef{xbar} \hlkwb{<-} \hldef{mu0} \hlopt{+} \hldef{diff.delta}
+
+\hldef{diff.p.random} \hlkwb{<-} \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{means} \hlopt{<=} \hldef{mirror)} \hlopt{+}
+                 \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{means} \hlopt{>=} \hldef{xbar)}
+
+\hldef{(closer.p.random)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\begin{alltt}
+\hldef{(further.p.random)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\begin{alltt}
+\hldef{(diff.p.random)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+All the p-values are zero which means there is statistically discernible support for the alternative hypothesis. The p-value of zero suggests that the observed mean is in the right tail for close, left tail for further, and in both tails for the difference.
   \item Compute the randomization confidence interval by iterating over values of $\mu_0$.\\
   \textbf{Hint:} You can ``search" for the lower bound from $Q_1$ and subtracting by 0.0001, 
   and the upper bound using $Q_3$ and increasing by 0.0001. You will continue until you find 
   the first value for which the two-sided $p$-value is greater than or equal to 0.05.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{CI.finder} \hlkwb{<-} \hlkwa{function}\hldef{(}\hlkwc{data}\hldef{,} \hlkwc{R} \hldef{=} \hlnum{1000}\hldef{)\{}
+
+  \hldef{mu0.iter} \hlkwb{<-} \hlnum{0.01}
+  \hldef{mu0.lower} \hlkwb{<-} \hlkwd{mean}\hldef{(data)}
+  \hldef{mu0.higher} \hlkwb{<-} \hlkwd{mean}\hldef{(data)}
+
+  \hlkwa{repeat}\hldef{\{}
+    \hldef{random} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{means} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+
+    \hldef{shifted.data} \hlkwb{<-} \hldef{data} \hlopt{-} \hldef{mu0.lower}
+
+    \hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R) \{}
+      \hldef{curr.random} \hlkwb{<-} \hldef{shifted.data} \hlopt{*} \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+                                           \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(shifted.data),}
+                                           \hlkwc{replace} \hldef{=} \hlnum{TRUE}\hldef{)}
+      \hldef{random}\hlopt{$}\hldef{means[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(curr.random)}
+    \hldef{\}}
+
+    \hldef{random} \hlkwb{<-} \hldef{random |>}
+      \hlkwd{mutate}\hldef{(}\hlkwc{means} \hldef{= means} \hlopt{+} \hldef{mu0.lower)}
+
+    \hldef{delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(data)} \hlopt{-} \hldef{mu0.lower)}
+    \hldef{low} \hlkwb{<-} \hldef{mu0.lower} \hlopt{-} \hldef{delta}
+    \hldef{high} \hlkwb{<-} \hldef{mu0.lower} \hlopt{+} \hldef{delta}
+    \hldef{p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(random}\hlopt{$}\hldef{means} \hlopt{<=} \hldef{low)} \hlopt{+}
+             \hlkwd{mean}\hldef{(random}\hlopt{$}\hldef{means} \hlopt{>=} \hldef{high)}
+
+    \hlkwa{if}\hldef{(p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+      \hlkwa{break}
+    \hldef{\}}\hlkwa{else}\hldef{\{}
+      \hldef{mu0.lower} \hlkwb{<-} \hldef{mu0.lower} \hlopt{-} \hldef{mu0.iter}
+    \hldef{\}}
+  \hldef{\}}
+
+  \hlkwa{repeat}\hldef{\{}
+    \hldef{random} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{means} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+
+    \hldef{shifted.data} \hlkwb{<-} \hldef{data} \hlopt{-} \hldef{mu0.higher}
+
+    \hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R) \{}
+      \hldef{curr.random} \hlkwb{<-} \hldef{shifted.data} \hlopt{*} \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+                                           \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(shifted.data),}
+                                           \hlkwc{replace} \hldef{=} \hlnum{TRUE}\hldef{)}
+      \hldef{random}\hlopt{$}\hldef{means[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(curr.random)}
+    \hldef{\}}
+
+    \hldef{random} \hlkwb{<-} \hldef{random |>}
+      \hlkwd{mutate}\hldef{(}\hlkwc{means} \hldef{= means} \hlopt{+} \hldef{mu0.higher)}
+
+    \hldef{delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(data)} \hlopt{-} \hldef{mu0.higher)}
+    \hldef{low} \hlkwb{<-} \hldef{mu0.higher} \hlopt{-} \hldef{delta}
+    \hldef{high} \hlkwb{<-} \hldef{mu0.higher} \hlopt{+} \hldef{delta}
+    \hldef{p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(random}\hlopt{$}\hldef{means} \hlopt{<=} \hldef{low)} \hlopt{+}
+      \hlkwd{mean}\hldef{(random}\hlopt{$}\hldef{means} \hlopt{>=} \hldef{high)}
+
+    \hlkwa{if}\hldef{(p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+      \hlkwa{break}
+    \hldef{\}}\hlkwa{else}\hldef{\{}
+      \hldef{mu0.higher} \hlkwb{<-} \hldef{mu0.higher} \hlopt{+} \hldef{mu0.iter}
+    \hldef{\}}
+  \hldef{\}}
+
+  \hlkwd{return}\hldef{(}\hlkwd{c}\hldef{(mu0.lower, mu0.higher))}
+\hldef{\}}
+
+\hldef{(close.CI.randomization} \hlkwb{<-} \hlkwd{CI.finder}\hldef{(data}\hlopt{$}\hldef{closer))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.1062231 0.1962231
+\end{verbatim}
+\begin{alltt}
+\hldef{(further.CI.randomization} \hlkwb{<-} \hlkwd{CI.finder}\hldef{(data}\hlopt{$}\hldef{further))}
+\end{alltt}
+\begin{verbatim}
+## [1] -0.2627244 -0.1427244
+\end{verbatim}
+\begin{alltt}
+\hldef{(diff.CI.randomization} \hlkwb{<-} \hlkwd{CI.finder}\hldef{(data}\hlopt{$}\hldef{diff))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.2589475 0.4489475
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+The confidence intervals are (0.1062231, 0.1962231) for close, (-0.2627244, -0.1427244) for further, and (0.2589475, 0.4489475) for difference. These values are similar to those found earlier in the bootstrap and t-test methods.
+
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

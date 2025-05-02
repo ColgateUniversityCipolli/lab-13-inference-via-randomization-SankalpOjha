@@ -231,7 +231,91 @@ diff.rand <- randomization.dist(data$diff, 0)
 ################################################################################
 ## Question 3B
 ################################################################################
+closer.mean <- mean(data$closer)
+closer.p.random <- mean(closer.rand$means >= closer.mean)
 
+further.mean <- mean(data$further)
+further.p.random <- mean(farther.rand$means <= further.mean)
+
+diff.delta <- abs(mean(data$diff) - mu0)
+mirror <- mu0 - diff.delta
+xbar <- mu0 + diff.delta
+
+diff.p.random <- mean(diff.rand$means <= mirror) + 
+                 mean(diff.rand$means >= xbar)
+
+(closer.p.random)
+(further.p.random)
+(diff.p.random)
 ################################################################################
 ## Question 3C
 ################################################################################
+CI.finder <- function(data, R = 10000){
+  
+  mu0.iter <- 0.01
+  mu0.lower <- mean(data)
+  mu0.higher <- mean(data)
+  
+  repeat{
+    random <- tibble(means = rep(NA, R))
+    
+    shifted.data <- data - mu0.lower
+    
+    for(i in 1:R) {
+      curr.random <- shifted.data * sample(x = c(-1, 1), 
+                                           size = length(shifted.data), 
+                                           replace = TRUE)
+      random$means[i] <- mean(curr.random)
+    }
+    
+    random <- random |>
+      mutate(means = means + mu0.lower)
+    
+    delta <- abs(mean(data) - mu0.lower)
+    low <- mu0.lower - delta 
+    high <- mu0.lower + delta   
+    p.val <- mean(random$means <= low) +
+             mean(random$means >= high)
+    
+    if(p.val < 0.05){
+      break
+    }else{
+      mu0.lower <- mu0.lower - mu0.iter
+    }
+  }
+  
+  repeat{
+    random <- tibble(means = rep(NA, R))
+    
+    shifted.data <- data - mu0.higher
+    
+    for(i in 1:R) {
+      curr.random <- shifted.data * sample(x = c(-1, 1), 
+                                           size = length(shifted.data), 
+                                           replace = TRUE)
+      random$means[i] <- mean(curr.random)
+    }
+    
+    random <- random |>
+      mutate(means = means + mu0.higher)
+    
+    delta <- abs(mean(data) - mu0.higher)
+    low <- mu0.higher - delta 
+    high <- mu0.higher + delta   
+    p.val <- mean(random$means <= low) +
+      mean(random$means >= high)
+    
+    if(p.val < 0.05){
+      break
+    }else{
+      mu0.higher <- mu0.higher + mu0.iter
+    }
+  }
+  
+  return(c(mu0.lower, mu0.higher))
+}
+
+(close.CI.randomization <- CI.finder(data$closer))
+(further.CI.randomization <- CI.finder(data$further))
+(diff.CI.randomization <- CI.finder(data$diff))
+
