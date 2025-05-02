@@ -16,6 +16,12 @@
 \begin{document}
 <<echo=F, message=F, warning=F>>=
 library(tidyverse)
+library(xtable)
+library(VGAM)
+library(e1071)
+library(pwr)
+library(effectsize)
+library(boot)
 @
 
 \begin{enumerate}
@@ -36,11 +42,55 @@ for the the further observations.
   \end{align*}
   where $f_Z(\cdot)$ and $F_Z(\cdot)$ are the Gaussian PDF and CDF and skew is the
   skewness of the data. What is the potential error in the computation of the 
-  $p$-value when testing $H_0: \mu_X=0; H_a: \mu_X<0$ using the zebra finch further data? 
+  $p$-value when testing $H_0: \mu_X=0; H_a: \mu_X<0$ using the zebra finch further data?
+<<message=F, warning=F, eval=T>>=
+data <- read_csv("zebrafinches.csv")
+
+mu0 <- 0
+t.stat <- t.test(data$further,
+                    mu = mu0,
+                    alternative = "less")
+t.further <- t.stat$statistic
+
+n <- length(data$further)
+
+skewness <- skewness(data$further)
+fz <- dnorm(t.further)
+Fz <- pnorm(t.further)
+
+(edgeworth.error <- (skewness/sqrt(n)) * (((2*(t.further)^2 + 1)/6)*(fz)))
+
+(probability <- Fz + edgeworth.error)
+@
+
+The probability is \Sexpr{probability} and the Edgeworth approximation is \Sexpr{edgeworth.error}. As the value of the Edgeworth approximation is small, the t-test can be said to be \textbf{NOT} "far off".
 
   \item Compute the error for $t$ statistics from -10 to 10 and plot a line
   that shows the error across $t$. Continue to use the skewness and 
   the sample size for the zebra finch further data.
+  
+<<message=F, warning=F, eval=T>>=
+t.vals <- seq(-10,10, length = 1000)
+fzb <- dnorm(t.vals)
+
+error.vals <- (skewness/sqrt(n)) * (((2*(t.vals)^2 + 1)/6)*(fzb))
+
+tvals.error <- tibble(
+  t = t.vals,
+  error = error.vals
+)
+
+ggplot()+
+  geom_line(data = tvals.error,
+            aes(x = t, y = error),
+            color = "red")+
+  theme_bw()+
+  labs(title = "Edgeworth Approximation For Error",
+       x = "T Values (-10,10)",
+       y = "Error")
+@
+
+The plot looks like a \textbf{W}. The plot shows that t values $<5$ and $>5$ are zero. The most error 
 
   \item Suppose we wanted to have a tail probability within 10\% of the desired
   $\alpha=0.05$. Recall we did a left-tailed test using the further data.
@@ -49,10 +99,18 @@ for the the further observations.
   \[0.10 \alpha  \stackrel{set}{=} \underbrace{\frac{\text{skew}}{\sqrt{n}} \frac{(2t^2+1)}{6} f_Z(t)}_{\textrm{error}},\]
   which yields
   \[ n = \left(\frac{\text{skew}}{6(0.10\alpha)} (2t^2 + 1) f_Z(t)\right)^2.\]
+
+<<message=F, warning=F, eval=T>>=  
+val.t <- qnorm(0.05)
+fzc <- dnorm(val.t)
+
+(n <- ((skewness/(6*(0.10*0.05))) * (2*val.t^2 + 1) *fzc)^2)
+@
+The sample size needed to reach $\alpha = 0.05$ is \Sexpr{n}. To reach 10\% of $\alpha = 0.05$, we will need a much larger sample than the 25 taken in the study.
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 3
+% Question 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Complete the following steps to revisit the analyses from lab 11 using the
@@ -67,17 +125,165 @@ sampling distribution of the $T$ statistic:
   object called \texttt{resamples.null.closer}, for example, and store the 
   resamples shifted to ensure they are consistent with the null hypotheses at the average 
   (i.e., here ensure the shifted resamples are 0 on average, corresponding
-  to $t=0$, for each case). 
-  \item Compute the bootstrap $p$-value for each test using the shifted resamples. 
-  How do these compare to the $t$-test $p$-values?
+  to $t=0$, for each case).
+<<message=F, warning=F, eval=T>>=    
+R <- 10000
+sd.closer <- sd(data$closer)
+num.closer <- length(data$closer)
+resamples.closer <-  tibble(tstat=rep(NA, R),
+                            xbar=rep(NA, R))
+for(i in 1:R){
+  curr.resample <- sample(x = data$closer,
+                          size = num.closer,
+                          replace = T)
+  resamples.closer$tstat[i] <- (mean(curr.resample)-0)/(sd.closer/sqrt(num.closer))
+  resamples.closer$xbar[i] <- mean(curr.resample)
+}
+
+
+closer.delta <- mean(resamples.closer$tstat) - 0
+
+resamples.null.closer <- resamples.closer |>
+  mutate(shifted = tstat - closer.delta)
+
+R <- 10000
+sd.further <- sd(data$further)
+num.further <- length(data$further)
+resamples.further <- tibble(tstat=rep(NA, R),
+                            xbar=rep(NA, R))
+for(i in 1:R){
+  curr.resample <- sample(x = data$further,
+                          size = num.further,
+                          replace = T)
+  resamples.further$tstat[i] <- (mean(curr.resample)-0)/(sd.further/sqrt(num.further))
+  resamples.further$xbar[i] <- mean(curr.resample)
+}
+
+
+further.delta <- mean(resamples.further$tstat) - 0
+
+resamples.null.further <- resamples.further |>
+  mutate(shifted = tstat - further.delta)
+
+R <- 10000
+sd.diff <- sd(data$diff)
+num.diff <- length(data$diff)
+resamples.diff <-  tibble(tstat=rep(NA, R),
+                          xbar=rep(NA, R))
+for(i in 1:R){
+  curr.resample <- sample(x = data$diff,
+                          size = num.diff,
+                          replace = T)
+  resamples.diff$tstat[i] <- (mean(curr.resample)-0)/(sd.diff/sqrt(num.diff))
+  resamples.diff$xbar[i] <- mean(curr.resample)
+}
+
+diff.delta <- mean(resamples.diff$tstat) - 0
+resamples.null.diff <- resamples.diff |>
+  mutate(shifted = tstat - diff.delta)
+
+(mean(resamples.null.closer$shifted))
+(mean(resamples.null.further$shifted))
+(mean(resamples.null.diff$shifted))
+@
+
+We tested to see whether the unknown distributions of closer, further, and difference are consistent with the null hypothesis at the average. We used resampling to approximate the distribution and then stored the shifted resamples. The closer shifted mean is \Sexpr{mean(resamples.null.closer$shifted)}, further shifted mean is \Sexpr{mean(resamples.null.further$shifted)}, and the difference shifted mean is \Sexpr{mean(resamples.null.diff$shifted)}. All of these values are near zero which indicates that the resamples are consistent with the null.
+ 
+  \item Compute the bootstrap $p$-value for each test using the shifted resamples. How do these compare to the $t$-test $p$-values?
+
+<<message=F, warning=F, eval=T>>= 
+# T-Test P-Value
+t.p.close <- t.test(data$closer,
+                     mu = 0,
+                     alternative = "greater")$p.value
+
+t.p.further <- t.test(data$further,
+                      mu = 0,
+                      alternative = "less")$p.value
+
+t.p.diff <- t.test(data$diff,
+                   mu = 0,
+                   alternative = "two.sided")$p.value
+
+# Bootstrap P-Value
+boot.p.closer <- mean(resamples.null.closer$shifted >= closer.delta)
+
+boot.p.further <- mean(resamples.null.further$shifted <= further.delta)
+
+low <- 0 - diff.delta
+high <- 0 + diff.delta
+p.low <- mean(resamples.null.diff$shifted <= low)
+p.high <- mean(resamples.null.diff$shifted >= high)
+boot.p.diff <- p.low + p.high
+
+(round(t.p.close, 4))
+(boot.p.closer)
+(round(t.p.further, 4))
+(boot.p.further)
+(round(t.p.diff, 4))
+(boot.p.diff)
+@
+
+As can be seen, both the T-Test P-Values and Bootstrap P-Values are all near zero and are represented as zero when rounded to four decimal places.
+
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
   Note this value approximates $t_{0.05, n-1}$. Compare these values in each case.
+
+<<message=F, warning=F, eval=T>>= 
+boot.closer.5th <- quantile(resamples.null.closer$shifted, 0.05)
+t.closer.5th <- qt(0.05, df = num.closer -1)
+
+boot.further.5th <- quantile(resamples.null.further$shifted, 0.05)
+t.further.5th <- qt(0.05, df = num.further -1)
+
+boot.diff.5th <- quantile(resamples.null.diff$shifted, 0.05)
+t.diff.5th <- qt(0.05, df = num.diff -1)
+
+(boot.closer.5th)
+(t.closer.5th)
+(boot.further.5th)
+(t.further.5th)
+(boot.diff.5th)
+(t.diff.5th)
+@
+
+The bootstrapping $5^{th}$ percentile for the various cases are \Sexpr{boot.closer.5th} for the close, \Sexpr{boot.further.5th} for the further, and \Sexpr{boot.further.5th} for the difference. The t-test $5^{th}$ percentile for the various cases are \Sexpr{t.closer.5th} for the close, \Sexpr{t.further.5th} for the further, and \Sexpr{t.diff.5th} for the difference. As we can see, the bootstrapping and t-test $5^{th}$ percentiles are fairly similar to each other.
+
   \item Compute the bootstrap confidence intervals using the resamples. How do these 
   compare to the $t$-test confidence intervals?
+
+<<message=F, warning=F, eval=T>>=  
+boot.CI.closer <- quantile(resamples.null.closer$xbar, c(0.025, 0.975))
+t.CI.closer <- t.test(x=data$closer, 
+                      mu = 0, 
+                      conf.level = 0.95, 
+                      alternative = "two.sided")$conf.int
+
+boot.CI.further <- quantile(resamples.null.further$xbar, c(0.025, 0.975))
+t.CI.further <- t.test(x=data$further, 
+                       mu = 0, 
+                       conf.level = 0.95, 
+                       alternative = "two.sided")$conf.int
+
+boot.CI.diff <- quantile(resamples.null.diff$xbar, c(0.025, 0.975))
+t.CI.diff <- t.test(x=data$diff, 
+                    mu = 0, 
+                    conf.level = 0.95, 
+                    alternative = "two.sided")$conf.int
+
+(boot.CI.closer)
+(t.CI.closer)
+(boot.CI.further)
+(t.CI.further)
+(boot.CI.diff)
+(t.CI.diff)
+@
+
+As can be seen, the confidence intervals for each case are fairly similar between the bootstrap and t-test and do not differ by a large value.
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 4
+% Question 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Complete the following steps to revisit the analyses from lab 11 using the
@@ -85,6 +291,37 @@ randomization procedure.
 \begin{enumerate}
 \item Now, consider the zebra finch data. We do not know the generating distributions
 for the closer, further, and difference data, so perform the randomization procedure
+
+<<message=F, warning=F, eval=T>>=  
+randomization.dist <- function(data, mu0, R = 10000) {
+  random <- tibble(means = rep(NA, R))
+  
+  shifted.data <- data - mu0
+  
+  for(i in 1:R) {
+    curr.random <- shifted.data * sample(x = c(-1, 1), 
+                                         size = length(shifted.data), 
+                                         replace = TRUE)
+    random$means[i] <- mean(curr.random)
+  }
+  
+  random <- random |>
+    mutate(means = means + mu0)
+  
+  return(random)
+}
+
+closer.rand <- randomization.dist(data$closer, 0)
+farther.rand <- randomization.dist(data$further, 0)
+diff.rand <- randomization.dist(data$diff, 0)
+
+(mean(closer.rand$means))
+(mean(farther.rand$means))
+(mean(diff.rand$means))
+@
+
+In this step, we found representative distribution for each case. As can be seen, each of the randomized distributions has a mean of about zero.
+
   \item Compute the randomization test $p$-value for each test.
   \item Compute the randomization confidence interval by iterating over values of $\mu_0$.\\
   \textbf{Hint:} You can ``search" for the lower bound from $Q_1$ and subtracting by 0.0001, 
